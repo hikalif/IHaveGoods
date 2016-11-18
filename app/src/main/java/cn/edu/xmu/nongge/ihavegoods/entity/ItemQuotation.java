@@ -1,5 +1,7 @@
 package cn.edu.xmu.nongge.ihavegoods.entity;
 
+import java.text.DecimalFormat;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,11 @@ public class ItemQuotation implements ItemContent {
 
     public ItemQuotation(Quotation quotation){
         this.quotation = quotation;
+    }
+
+    @Override
+    public long getId() {
+        return quotation.getWaybillid();
     }
 
     @Override
@@ -38,8 +45,9 @@ public class ItemQuotation implements ItemContent {
         TextView tvTruckType = (TextView) convertView.findViewById(R.id.quotation_trucker_type);
         TextView tvTruckQuotation = (TextView) convertView.findViewById(R.id.quotation_money);
         tvTruckerName.setText(quotation.getTruckerName());
-        tvTruckType.setText(quotation.getTruckType());
-        tvTruckQuotation.setText("¥"+quotation.getWaybillPrice());
+        tvTruckType.setText(quotation.getTruckCarplate() + " / " + quotation.getTruckType() + " / " + quotation.getTruckLoad() + "吨");
+        DecimalFormat df = new DecimalFormat("#.00");
+        tvTruckQuotation.setText("¥"+ df.format(quotation.getWaybillPrice()));
 
         return convertView;
     }

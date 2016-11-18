@@ -48,6 +48,8 @@ public class MainActivity extends FragmentActivity {
         pagerBottomTabStrip = (PagerBottomTabStrip) findViewById(R.id.tab);
         pagerBottomTabStrip.builder(viewPager)
                 .ColorMode()
+                .TabClickIconColor(R.color.colorPrimary)
+                .TabClickTextColor(R.color.white)
                 .TabIcon(iconResid)
                 .TabBackground(R.drawable.background_tab)
                 .TabClickIcon(iconResidClick)

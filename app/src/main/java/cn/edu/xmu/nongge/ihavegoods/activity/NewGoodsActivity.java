@@ -120,7 +120,8 @@ public class NewGoodsActivity extends AppCompatActivity implements IGoodsPreview
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(NewGoodsActivity.this, AddressManagementActivity.class);
-                startActivity(intent);
+                intent.putExtra("employerid", 1);
+                startActivityForResult(intent, 1);
             }
         });
 
@@ -132,7 +133,8 @@ public class NewGoodsActivity extends AppCompatActivity implements IGoodsPreview
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(NewGoodsActivity.this, AddressManagementActivity.class);
-                startActivity(intent);
+                intent.putExtra("employerid", 1);
+                startActivityForResult(intent, 2);
             }
         });
 
@@ -176,6 +178,28 @@ public class NewGoodsActivity extends AppCompatActivity implements IGoodsPreview
         request.put("receiptAddressid", goods.getReceiptAddressid());
         request.put("employerid", 1);
         mGoodsPresenter.publishGoods(request.toString());
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        long addr_id = data.getLongExtra("addressId", 0);
+        String addr_name = data.getStringExtra("addressName");
+        String addr_phone = data.getStringExtra("addressPhone");
+        String addr_address = data.getStringExtra("addressAddress");
+        switch (requestCode){
+            case 1:
+                tvSenderName.setText(addr_name);
+                tvSenderPhone.setText(addr_phone);
+                tvSenderAddress.setText(addr_address);
+                break;
+            case 2:
+                tvReceiverName.setText(addr_name);
+                tvReceiverPhone.setText(addr_phone);
+                tvReceiverAddress.setText(addr_address);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override

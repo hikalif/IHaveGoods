@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -20,6 +21,7 @@ import cn.edu.xmu.nongge.ihavegoods.R;
 import cn.edu.xmu.nongge.ihavegoods.adapter.AddressAdapter;
 import cn.edu.xmu.nongge.ihavegoods.decoration.RecyclerViewDivider;
 import cn.edu.xmu.nongge.ihavegoods.entity.Address;
+import cn.edu.xmu.nongge.ihavegoods.listener.OnItemClickListener;
 import cn.edu.xmu.nongge.ihavegoods.mvp.presenter.AddressPresenter;
 import cn.edu.xmu.nongge.ihavegoods.mvp.view.IAddressPreview;
 
@@ -67,6 +69,19 @@ public class AddressManagementActivity extends AppCompatActivity implements IAdd
         adapter = new AddressAdapter(AddressManagementActivity.this, addressList);
         recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new RecyclerViewDivider(this, LinearLayoutManager.HORIZONTAL));
+        adapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int postion) {
+                Address tempAddress = addressList.get(postion);
+                Intent intent = new Intent();
+                intent.putExtra("addressId", tempAddress.getId());
+                intent.putExtra("addressName", tempAddress.getName());
+                intent.putExtra("addressPhone", tempAddress.getTelephone());
+                intent.putExtra("addressAddress", tempAddress.getAddress());
+                setResult(0, intent);
+                finish();
+            }
+        });
     }
 
     private void requestPreview(){
@@ -78,9 +93,12 @@ public class AddressManagementActivity extends AppCompatActivity implements IAdd
     @Override
     public void getMyAddressList(List<Address> addressList){
         Log.i("Http", "个数" + addressList.size() + "");
+        this.addressList = addressList;
         adapter.setAddressList(addressList);
         adapter.notifyDataSetChanged();
     }
+
+
 
     //测试用
     /*private List<Address> getAddressList()

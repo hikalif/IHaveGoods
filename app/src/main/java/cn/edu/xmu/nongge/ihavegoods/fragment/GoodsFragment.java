@@ -2,8 +2,10 @@ package cn.edu.xmu.nongge.ihavegoods.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -21,6 +24,7 @@ import java.util.List;
 
 import cn.edu.xmu.nongge.ihavegoods.R;
 import cn.edu.xmu.nongge.ihavegoods.activity.NewGoodsActivity;
+import cn.edu.xmu.nongge.ihavegoods.activity.QuotationDetailsActivity;
 import cn.edu.xmu.nongge.ihavegoods.adapter.GoodsAdapter;
 import cn.edu.xmu.nongge.ihavegoods.adapter.ItemAdapter;
 import cn.edu.xmu.nongge.ihavegoods.decoration.RecyclerViewDivider;
@@ -29,8 +33,12 @@ import cn.edu.xmu.nongge.ihavegoods.entity.Item;
 import cn.edu.xmu.nongge.ihavegoods.entity.ItemContent;
 import cn.edu.xmu.nongge.ihavegoods.entity.ItemGoods;
 import cn.edu.xmu.nongge.ihavegoods.entity.ItemQuotation;
+import cn.edu.xmu.nongge.ihavegoods.entity.Quotation;
+import cn.edu.xmu.nongge.ihavegoods.listener.OnItemClickListener;
 import cn.edu.xmu.nongge.ihavegoods.mvp.presenter.GoodsPresenter;
+import cn.edu.xmu.nongge.ihavegoods.mvp.presenter.WaybillPresenter;
 import cn.edu.xmu.nongge.ihavegoods.mvp.view.IGoodsPreview;
+import cn.edu.xmu.nongge.ihavegoods.mvp.view.IQuotationDetailPreview;
 
 /**
  * Created by asus1 on 2016/10/26.
@@ -38,6 +46,8 @@ import cn.edu.xmu.nongge.ihavegoods.mvp.view.IGoodsPreview;
 public class GoodsFragment extends Fragment implements IGoodsPreview {
 
     private GoodsPresenter mGoodsPresenter;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private List<Goods> goodsList = new ArrayList();
     private List<Item> itemList = new ArrayList<Item>();
@@ -62,6 +72,20 @@ public class GoodsFragment extends Fragment implements IGoodsPreview {
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), NewGoodsActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        swipeRefreshLayout = (SwipeRefreshLayout)view.findViewById(R.id.swipe_container);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        requestPreview();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                }, 6000);
             }
         });
 
@@ -94,6 +118,22 @@ public class GoodsFragment extends Fragment implements IGoodsPreview {
         itemAdapter = new ItemAdapter(getActivity(), itemContentList);
         recyclerView.setAdapter(itemAdapter);
         recyclerView.addItemDecoration(new RecyclerViewDivider(getActivity(), LinearLayoutManager.HORIZONTAL));
+        itemAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int postion) {
+                //operate each item
+                if(itemContentList.get(postion).getLayout() == R.layout.item_goods){
+                    Toast.makeText(getActivity(), "goods", Toast.LENGTH_SHORT).show();
+                }
+                else if(itemContentList.get(postion).getLayout() == R.layout.item_quotation){
+                    //Toast.makeText(getActivity(), "quotation", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getActivity(), QuotationDetailsActivity.class);
+                    intent.putExtra("waybillid", itemContentList.get(postion).getId());
+                    Log.d("cgf", "waybillid"+itemContentList.get(postion).getId());
+                    startActivity(intent);
+                }
+            }
+        });
     }
 
     private void requestPreview(){
@@ -117,6 +157,7 @@ public class GoodsFragment extends Fragment implements IGoodsPreview {
 
     @Override
     public void getItemList(List<Item> itemList) {
+        itemContentList.removeAll(itemContentList);
         Log.i("Http", "个数" + itemList.size() + "");
         for(int i = 0; i < itemList.size(); i++)
         {
@@ -130,7 +171,7 @@ public class GoodsFragment extends Fragment implements IGoodsPreview {
 
             Log.d("cgf", "quotation size:" + itemList.get(i).getQuotationList().size());
             if(itemList.get(i).getQuotationList() != null){
-                for(int j = 0; j < itemList.get(i).getQuotationList().size(); i++)
+                for(int j = 0; j < itemList.get(i).getQuotationList().size(); j++)
                 {
                     ItemQuotation itemQuotation = new ItemQuotation(itemList.get(i).getQuotationList().get(j));
                     itemContentList.add(itemQuotation);
@@ -140,11 +181,9 @@ public class GoodsFragment extends Fragment implements IGoodsPreview {
                 Log.d("cgf", "quotation is none");
             }
         }
-        Log.d("cgf", itemContentList.toString());
         itemAdapter.setItemList(itemContentList);
         itemAdapter.notifyDataSetChanged();
     }
-
 
 
     /*private List<Goods> getGoodsList()

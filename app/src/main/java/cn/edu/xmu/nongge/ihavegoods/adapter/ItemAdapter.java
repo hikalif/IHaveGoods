@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import cn.edu.xmu.nongge.ihavegoods.entity.ItemContent;
+import cn.edu.xmu.nongge.ihavegoods.listener.OnItemClickListener;
 
 /**
  * Created by Yui on 2016/11/15.
@@ -19,6 +20,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     private List<ItemContent> list;
     private LayoutInflater mIflater;
 
+    private OnItemClickListener mOnItemClickListener = null;
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.mOnItemClickListener = listener;
+    }
 
     public ItemAdapter(Context mContext, List<ItemContent> list) {
         this.mContext = mContext;
@@ -33,7 +39,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         ViewHolder holder =
-                new ViewHolder(list.get(viewType).getView(mContext, parent, mIflater));
+                new ViewHolder(list.get(viewType).getView(mContext, parent, mIflater), mOnItemClickListener);
         times++;
         Log.d("MyAdapter", "times:" + times);
         return holder;
@@ -85,9 +91,21 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         this.list.clear();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
-        public ViewHolder(View itemView) {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        OnItemClickListener onItemClickListener;
+
+        public ViewHolder(View itemView, OnItemClickListener listener) {
             super(itemView);
+
+            onItemClickListener = listener;
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            if (onItemClickListener != null) {
+                onItemClickListener.onItemClick(view, getLayoutPosition());
+            }
         }
     }
 }

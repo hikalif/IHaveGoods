@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import cn.edu.xmu.nongge.ihavegoods.http.service.AddressService;
 import cn.edu.xmu.nongge.ihavegoods.http.service.GoodsService;
+import cn.edu.xmu.nongge.ihavegoods.http.service.WaybillService;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -22,6 +23,7 @@ public class RetrofitUtil {
 
     private GoodsService mGoodsService;
     private AddressService mAddressService;
+    private WaybillService mWaybillService;
     /**
      * 私有构造方法
      */
@@ -41,6 +43,7 @@ public class RetrofitUtil {
 
         mGoodsService = mRetrofit.create(GoodsService.class);
         mAddressService = mRetrofit.create(AddressService.class);
+        mWaybillService = mRetrofit.create(WaybillService.class);
     }
 
     //在访问RetrofitUtil时创建单例
@@ -60,4 +63,6 @@ public class RetrofitUtil {
     public AddressService getMyAddressService() {
         return mAddressService;
     }
+
+    public WaybillService getmWaybillService() { return mWaybillService; }
 }

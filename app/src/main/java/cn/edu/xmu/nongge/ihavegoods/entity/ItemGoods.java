@@ -20,6 +20,11 @@ public class ItemGoods implements ItemContent {
     }
 
     @Override
+    public long getId() {
+        return goods.getId();
+    }
+
+    @Override
     public int getLayout() {
         return R.layout.item_goods;
     }
